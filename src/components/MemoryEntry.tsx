@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, PenTool, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface MemoryEntry {
   id: string;
@@ -17,22 +19,56 @@ interface MemoryEntry {
 export function MemoryEntry() {
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [aiFeedback, setAiFeedback] = useState<string | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSubmit = async () => {
-    if (!content.trim()) return;
+    if (!content.trim() || !user) return;
     
     setIsSubmitting(true);
     
-    // Simulate submission delay
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Get AI sentiment analysis
+      const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-sentiment', {
+        body: { content }
+      });
+
+      if (analysisError) {
+        console.error('AI analysis error:', analysisError);
+      }
+
+      // Save memory to database
+      const { error: dbError } = await supabase
+        .from('memories')
+        .insert({
+          user_id: user.id,
+          content,
+          sentiment_score: analysisData?.sentiment_score || null,
+          sentiment_label: analysisData?.sentiment_label || null,
+          ai_feedback: analysisData?.feedback || null,
+        });
+
+      if (dbError) {
+        throw dbError;
+      }
+
+      setAiFeedback(analysisData?.feedback || null);
       setContent("");
       toast({
         title: "Memory saved! ✨",
-        description: "Your thoughts have been safely stored.",
+        description: "Your thoughts have been safely stored with AI insights.",
       });
-    }, 1000);
+    } catch (error: any) {
+      console.error('Error saving memory:', error);
+      toast({
+        title: "Error saving memory",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -89,17 +125,19 @@ export function MemoryEntry() {
           </Button>
         </div>
 
-        {/* AI Feedback Placeholder */}
-        <div className="bg-accent/20 rounded-lg p-4 border border-accent/30">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-foreground">AI Wellness Insights</span>
-            <Badge variant="secondary" className="text-xs">Coming Soon</Badge>
+        {/* AI Feedback */}
+        {aiFeedback && (
+          <div className="bg-accent/20 rounded-lg p-4 border border-accent/30">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium text-foreground">AI Wellness Insights</span>
+              <Badge variant="secondary" className="text-xs">Active</Badge>
+            </div>
+            <p className="text-sm text-foreground">
+              {aiFeedback}
+            </p>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Connect to Supabase to enable AI-powered sentiment analysis and personalized wellness feedback.
-          </p>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

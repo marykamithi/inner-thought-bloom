@@ -3,10 +3,25 @@ import { Navigation } from "@/components/Navigation";
 import { MemoryEntry } from "@/components/MemoryEntry";
 import { MemoryTimeline } from "@/components/MemoryTimeline";
 import { WellnessStats } from "@/components/WellnessStats";
+import { AuthForm } from "@/components/AuthForm";
+import { useAuth } from "@/hooks/useAuth";
 import { Heart, Sparkles, Brain } from "lucide-react";
 
 const Index = () => {
+  const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState('write');
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthForm />;
+  }
 
   const renderContent = () => {
     switch (activeTab) {

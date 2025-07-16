@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, PenTool, BarChart3, User, Menu } from "lucide-react";
+import { Heart, PenTool, BarChart3, User, Menu, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 interface NavigationProps {
   activeTab: string;
@@ -9,6 +10,7 @@ interface NavigationProps {
 }
 
 export function Navigation({ activeTab, onTabChange }: NavigationProps) {
+  const { signOut } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const tabs = [
@@ -41,6 +43,16 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
               </Button>
             );
           })}
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={signOut}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground ml-4"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </Button>
         </div>
       </nav>
 
@@ -90,6 +102,18 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
                   </Button>
                 );
               })}
+            </div>
+            
+            <div className="border-t border-accent/30 p-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={signOut}
+                className="w-full flex items-center gap-2 text-muted-foreground hover:text-foreground"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
             </div>
           </div>
         )}
