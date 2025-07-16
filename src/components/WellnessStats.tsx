@@ -334,31 +334,6 @@ export function WellnessStats() {
         </CardContent>
       </Card>
       )}
-
-      {/* AI Insights Placeholder */}
-      <Card className="shadow-card bg-gradient-card border-0">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            AI Wellness Insights
-            <Badge variant="secondary" className="text-xs ml-2">Coming Soon</Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-accent/20 rounded-lg p-6 text-center border border-accent/30">
-            <Sparkles className="h-12 w-12 text-primary/50 mx-auto mb-4" />
-            <h3 className="font-medium text-foreground mb-2">Advanced Analytics Coming Soon</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Connect to Supabase to unlock AI-powered insights including:
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
-              <div>📊 Sentiment trends over time</div>
-              <div>🎯 Personalized wellness tips</div>
-              <div>☁️ Word cloud analysis</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

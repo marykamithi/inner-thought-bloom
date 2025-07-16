@@ -3,6 +3,11 @@ import { Navigation } from "@/components/Navigation";
 import { MemoryEntry } from "@/components/MemoryEntry";
 import { MemoryTimeline } from "@/components/MemoryTimeline";
 import { WellnessStats } from "@/components/WellnessStats";
+import { WellnessTracker } from "@/components/WellnessTracker";
+import { MeditationTimer } from "@/components/MeditationTimer";
+import { CrisisSupport } from "@/components/CrisisSupport";
+import { SearchMemories } from "@/components/SearchMemories";
+import { ExportData } from "@/components/ExportData";
 import { AuthForm } from "@/components/AuthForm";
 import { useAuth } from "@/hooks/useAuth";
 import { Heart, Sparkles, Brain } from "lucide-react";
@@ -29,8 +34,18 @@ const Index = () => {
         return <MemoryEntry />;
       case 'timeline':
         return <MemoryTimeline />;
+      case 'search':
+        return <SearchMemories />;
       case 'stats':
         return <WellnessStats />;
+      case 'tracker':
+        return <WellnessTracker />;
+      case 'meditation':
+        return <MeditationTimer />;
+      case 'export':
+        return <ExportData />;
+      case 'support':
+        return <CrisisSupport />;
       default:
         return <MemoryEntry />;
     }

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, PenTool, BarChart3, User, Menu, LogOut } from "lucide-react";
+import { Heart, PenTool, BarChart3, User, Menu, LogOut, BookOpen, Activity, Brain, Shield, Search, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface NavigationProps {
   activeTab: string;
@@ -15,8 +16,13 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
 
   const tabs = [
     { id: 'write', label: 'Write Memory', icon: PenTool },
-    { id: 'timeline', label: 'Timeline', icon: Heart },
-    { id: 'stats', label: 'Wellness Stats', icon: BarChart3 },
+    { id: 'timeline', label: 'Timeline', icon: BookOpen },
+    { id: 'search', label: 'Search', icon: Search },
+    { id: 'stats', label: 'Analytics', icon: BarChart3 },
+    { id: 'tracker', label: 'Wellness', icon: Activity },
+    { id: 'meditation', label: 'Meditation', icon: Brain },
+    { id: 'export', label: 'Export', icon: Download },
+    { id: 'support', label: 'Support', icon: Heart },
   ];
 
   return (
@@ -44,15 +50,18 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
             );
           })}
           
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={signOut}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground ml-4"
-          >
-            <LogOut className="h-4 w-4" />
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-2 ml-4">
+            <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={signOut}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </nav>
 
@@ -79,7 +88,7 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="border-t border-accent/30 bg-background/95 backdrop-blur-sm">
-            <div className="grid grid-cols-3 gap-1 p-2">
+            <div className="grid grid-cols-2 gap-1 p-2">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -104,12 +113,13 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
               })}
             </div>
             
-            <div className="border-t border-accent/30 p-2">
+            <div className="border-t border-accent/30 p-2 flex items-center justify-between">
+              <ThemeToggle />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={signOut}
-                className="w-full flex items-center gap-2 text-muted-foreground hover:text-foreground"
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
               >
                 <LogOut className="h-4 w-4" />
                 Sign Out
