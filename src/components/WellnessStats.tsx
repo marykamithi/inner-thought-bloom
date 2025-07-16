@@ -1,20 +1,187 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Calendar, Smile, BarChart3, Heart, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+
+interface Memory {
+  id: string;
+  content: string;
+  created_at: string;
+  sentiment_label: string | null;
+  sentiment_score: number | null;
+}
+
+interface WellnessStats {
+  totalEntries: number;
+  entriesThisWeek: number;
+  averageMood: string;
+  streak: number;
+  moodDistribution: {
+    positive: number;
+    neutral: number;
+    negative: number;
+  };
+}
 
 export function WellnessStats() {
-  // Sample data for demonstration
-  const stats = {
-    totalEntries: 24,
-    entriesThisWeek: 5,
-    averageMood: 'positive',
-    streak: 7,
-    mostActiveDay: 'Tuesday',
+  const [stats, setStats] = useState<WellnessStats>({
+    totalEntries: 0,
+    entriesThisWeek: 0,
+    averageMood: 'neutral',
+    streak: 0,
     moodDistribution: {
-      positive: 60,
-      neutral: 30,
-      negative: 10
+      positive: 0,
+      neutral: 0,
+      negative: 0
     }
+  });
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      fetchAndCalculateStats();
+      
+      // Set up real-time subscription to refresh stats when memories change
+      const subscription = supabase
+        .channel('wellness-stats')
+        .on('postgres_changes', 
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'memories',
+            filter: `user_id=eq.${user.id}`
+          }, 
+          () => {
+            fetchAndCalculateStats();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [user]);
+
+  const fetchAndCalculateStats = async () => {
+    try {
+      const { data: memories, error } = await supabase
+        .from('memories')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (memories && memories.length > 0) {
+        const calculatedStats = calculateStats(memories);
+        setStats(calculatedStats);
+      }
+    } catch (error) {
+      console.error('Error fetching memories for stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateStats = (memories: Memory[]): WellnessStats => {
+    const totalEntries = memories.length;
+    
+    // Calculate entries this week
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    const entriesThisWeek = memories.filter(memory => 
+      new Date(memory.created_at) >= oneWeekAgo
+    ).length;
+
+    // Calculate mood distribution
+    const moodCounts = memories.reduce((acc, memory) => {
+      const mood = memory.sentiment_label || 'neutral';
+      acc[mood] = (acc[mood] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const positive = totalEntries > 0 ? Math.round(((moodCounts.positive || 0) / totalEntries) * 100) : 0;
+    const negative = totalEntries > 0 ? Math.round(((moodCounts.negative || 0) / totalEntries) * 100) : 0;
+    const neutral = totalEntries > 0 ? 100 - positive - negative : 0;
+
+    // Determine average mood based on highest percentage
+    let averageMood = 'neutral';
+    if (totalEntries > 0) {
+      const maxCount = Math.max(positive, negative, neutral);
+      if (maxCount === positive) averageMood = 'positive';
+      else if (maxCount === negative) averageMood = 'negative';
+      else averageMood = 'neutral';
+    }
+
+    // Calculate streak (consecutive days with entries)
+    const streak = calculateStreak(memories);
+
+    return {
+      totalEntries,
+      entriesThisWeek,
+      averageMood,
+      streak,
+      moodDistribution: {
+        positive,
+        neutral,
+        negative
+      }
+    };
+  };
+
+  const calculateStreak = (memories: Memory[]): number => {
+    if (memories.length === 0) return 0;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Get unique days with memories
+    const uniqueDays = new Set<number>();
+    memories.forEach(memory => {
+      const memoryDate = new Date(memory.created_at);
+      memoryDate.setHours(0, 0, 0, 0);
+      uniqueDays.add(memoryDate.getTime());
+    });
+
+    // Sort days in descending order (most recent first)
+    const sortedDays = Array.from(uniqueDays).sort((a, b) => (b as number) - (a as number));
+    
+    let streak = 0;
+    let expectedDate = today.getTime();
+    
+    // Check if there's an entry today or yesterday to start the streak
+    const hasEntryToday = sortedDays.includes(today.getTime());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const hasEntryYesterday = sortedDays.includes(yesterday.getTime());
+    
+    if (!hasEntryToday && !hasEntryYesterday) {
+      return 0; // No recent activity
+    }
+    
+    // Start from today or yesterday, whichever has an entry
+    if (hasEntryToday) {
+      expectedDate = today.getTime();
+    } else {
+      expectedDate = yesterday.getTime();
+    }
+    
+    // Count consecutive days
+    for (const day of sortedDays) {
+      if (day === expectedDate) {
+        streak++;
+        expectedDate -= 24 * 60 * 60 * 1000; // Move to previous day
+      } else if (day < expectedDate) {
+        // Gap found, stop counting
+        break;
+      }
+    }
+    
+    return streak;
   };
 
   const getMoodColor = (mood: string) => {
@@ -27,6 +194,14 @@ export function WellnessStats() {
         return 'text-yellow-600';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="w-full max-w-6xl mx-auto flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
@@ -46,6 +221,20 @@ export function WellnessStats() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.totalEntries === 0 ? (
+          <div className="col-span-full">
+            <Card className="shadow-card bg-gradient-card border-0">
+              <CardContent className="text-center py-12">
+                <Heart className="h-12 w-12 text-primary/50 mx-auto mb-4" />
+                <h3 className="font-medium text-foreground mb-2">No Memories Yet</h3>
+                <p className="text-sm text-muted-foreground">
+                  Start writing your first memory to see your wellness statistics here!
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
+          <>
         {/* Total Entries */}
         <Card className="shadow-card bg-gradient-card border-0 hover:shadow-glow transition-all duration-300">
           <CardHeader className="pb-2">
@@ -103,9 +292,12 @@ export function WellnessStats() {
             <div className="text-xs text-muted-foreground mt-1">Overall feeling</div>
           </CardContent>
         </Card>
+          </>
+        )}
       </div>
 
       {/* Mood Distribution */}
+      {stats.totalEntries > 0 && (
       <Card className="shadow-card bg-gradient-card border-0">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -141,6 +333,7 @@ export function WellnessStats() {
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* AI Insights Placeholder */}
       <Card className="shadow-card bg-gradient-card border-0">
