@@ -44,10 +44,14 @@ export function AuthForm() {
           error.message.includes("already been registered") ||
           error.message.includes("User already registered") ||
           error.message.includes("already signed up") ||
-          error.message.includes("email address is already in use")) {
+          error.message.includes("email address is already in use") ||
+          error.message.includes("Email rate limit exceeded") ||
+          error.message.includes("already exists") ||
+          error.message.includes("duplicate") ||
+          error.message.toLowerCase().includes("user with this email already exists")) {
         toast({
-          title: "Welcome back! 👋",
-          description: "This email is already registered. Switching you to sign in...",
+          title: "Account exists! 👋",
+          description: "This email is already registered. Please use the Sign In tab to access your account.",
         });
         // Switch to sign-in tab and keep the email filled
         setActiveTab("signin");
@@ -57,7 +61,7 @@ export function AuthForm() {
         setTimeout(() => {
           toast({
             title: "Ready to sign in! 🔑",
-            description: "Please enter your password to access your journal.",
+            description: "Please enter your password to access your wellness journal.",
           });
         }, 1500);
         return;

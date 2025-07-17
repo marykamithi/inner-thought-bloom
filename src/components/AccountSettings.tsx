@@ -22,6 +22,7 @@ import { useAuth } from "@/hooks/useAuth";
 export function AccountSettings() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmationText, setConfirmationText] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
   const { user, signOut } = useAuth();
 
@@ -47,6 +48,12 @@ export function AccountSettings() {
     setIsDeleting(true);
 
     try {
+      // Show immediate feedback
+      toast({
+        title: "Deleting account...",
+        description: "Please wait while we remove your data.",
+      });
+
       // Delete all user data first
       const { error: memoriesError } = await supabase
         .from('memories')
@@ -70,7 +77,6 @@ export function AccountSettings() {
       if (goalsError) throw goalsError;
 
       // Mark the user as deleted by updating their metadata
-      // This is a workaround since we can't directly delete the auth user from client
       const { error: updateError } = await supabase.auth.updateUser({
         data: { 
           account_deleted: true,
@@ -83,34 +89,44 @@ export function AccountSettings() {
         console.warn('Failed to mark account as deleted:', updateError);
       }
 
-      // Sign out the user
-      await signOut();
+      // Close dialog before signing out
+      setDialogOpen(false);
+      setConfirmationText("");
 
+      // Show success message
       toast({
         title: "Account data permanently deleted ✅",
-        description: "All your wellness data has been permanently deleted. Your account has been marked for deletion. For complete account removal, please contact support.",
+        description: "Signing you out now. Your account has been disabled.",
       });
+
+      // Small delay to let user see the message, then sign out
+      setTimeout(async () => {
+        await signOut();
+      }, 2000);
 
     } catch (error: any) {
       console.error('Delete account error:', error);
       
-      // Fallback: At least delete data and sign out
-      try {
-        await signOut();
-        toast({
-          title: "Data deleted successfully ⚠️",
-          description: "Your wellness data has been deleted and you've been signed out. For complete account removal, please contact support.",
-        });
-      } catch (signOutError) {
-        toast({
-          title: "Delete account failed 😔",
-          description: "We encountered an issue while deleting your account. Please contact support for assistance.",
-          variant: "destructive",
-        });
-      }
-    } finally {
+      // Reset states on error
       setIsDeleting(false);
+      setDialogOpen(false);
       setConfirmationText("");
+      
+      // Show error and attempt sign out anyway
+      toast({
+        title: "Delete account failed 😔",
+        description: "There was an issue deleting your account. Please contact support.",
+        variant: "destructive",
+      });
+
+      // Try to sign out anyway after a delay
+      setTimeout(async () => {
+        try {
+          await signOut();
+        } catch (signOutError) {
+          console.error('Sign out error:', signOutError);
+        }
+      }, 3000);
     }
   };
 
@@ -166,11 +182,12 @@ export function AccountSettings() {
             This action cannot be undone. All your journal entries, wellness data, and goals will be permanently deleted.
           </p>
           
-          <AlertDialog>
+          <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <AlertDialogTrigger asChild>
               <Button
                 variant="destructive"
                 className="w-full flex items-center gap-2"
+                onClick={() => setDialogOpen(true)}
               >
                 <UserX className="h-4 w-4" />
                 Delete My Account
@@ -207,7 +224,13 @@ export function AccountSettings() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setConfirmationText("")}>
+                <AlertDialogCancel 
+                  onClick={() => {
+                    setDialogOpen(false);
+                    setConfirmationText("");
+                    setIsDeleting(false);
+                  }}
+                >
                   Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction
