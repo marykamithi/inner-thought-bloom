@@ -16,7 +16,8 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
-    // In development, make confirmation more flexible
     detectSessionInUrl: true,
+    // Additional configuration for development
+    flowType: 'pkce'
   }
 });
