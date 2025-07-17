@@ -126,9 +126,25 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📄 License
+## 📄 License & Copyright
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**© 2025 Mary Kamithi. All Rights Reserved.**
+
+This project is protected under a **Proprietary License**. See the [LICENSE](LICENSE) file for complete terms.
+
+### ⚖️ **Important Legal Notice**
+- ✅ **Personal study and learning**: Allowed
+- ✅ **Forking for educational purposes**: Allowed  
+- ✅ **Contributing via pull requests**: Allowed (subject to approval)
+- ❌ **Commercial use without permission**: **PROHIBITED**
+- ❌ **Deployment without permission**: **PROHIBITED** 
+- ❌ **Claiming ownership**: **PROHIBITED**
+- ❌ **Redistribution as your own work**: **PROHIBITED**
+
+### 🚨 **Deployment Rights**
+**ONLY the original author (Mary Kamithi) has the right to deploy this software.** Any unauthorized deployment will result in immediate legal action.
+
+For licensing inquiries or commercial use permissions, contact: [your-email@example.com]
 
 ## 🙏 Acknowledgments
 
@@ -137,13 +153,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Backend powered by [Supabase](https://supabase.com)
 - Typography with [Inter](https://rsms.me/inter/) font family
 
-## 📞 Support
-
-If you encounter any issues or have questions:
-- 📧 Open an issue on GitHub
-- 💬 Join our [Discord community](https://discord.gg/your-invite)
-- 📖 Check the [Documentation](https://docs.yourapp.com)
-
----
 
 **Made with 💖 for mental wellness and self-care**

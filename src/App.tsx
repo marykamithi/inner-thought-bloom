@@ -1,3 +1,11 @@
+/**
+ * Inner Thought Bloom - Personal Wellness Companion
+ * Copyright (c) 2025 Mary Kamithi. All Rights Reserved.
+ * 
+ * This software is proprietary and confidential. Unauthorized copying,
+ * distribution, or use is strictly prohibited.
+ */
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";

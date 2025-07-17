@@ -2,6 +2,8 @@
   "name": "inner-thought-bloom",
   "description": "Your personal wellness companion for mindful journaling and mental health tracking",
   "author": "Mary Kamithi",
+  "copyright": "© 2025 Mary Kamithi. All Rights Reserved.",
+  "license": "PROPRIETARY",
   "private": true,
   "version": "1.0.0",
   "type": "module",
