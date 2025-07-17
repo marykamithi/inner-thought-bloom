@@ -27,7 +27,7 @@ export function AuthForm() {
 
     setIsLoading(true);
     
-    // Simple approach: Just create the user and try to sign in
+    // Create the user account and immediately try to sign them in
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -67,22 +67,31 @@ export function AuthForm() {
         variant: "destructive",
       });
     } else {
-      setIsLoading(false);
-      // Always show success and let user try to sign in
-      toast({
-        title: "Account created successfully! 🎉",
-        description: "Your account has been created. You can now sign in immediately!",
+      // Account created successfully, now try to sign in immediately
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
       
-      setActiveTab("signin");
-      setPassword("");
+      setIsLoading(false);
       
-      setTimeout(() => {
+      if (signInError) {
+        // If sign-in fails, show success message but switch to sign-in tab
         toast({
-          title: "Ready to sign in! 🔑",
-          description: "Please enter your password to start your wellness journey.",
+          title: "Account created! 🎉",
+          description: "Your account has been created successfully. Please sign in now.",
         });
-      }, 1500);
+        setActiveTab("signin");
+        setPassword("");
+      } else {
+        // Successfully signed in immediately after signup
+        toast({
+          title: "Welcome to Inner Thought Bloom! 🎉",
+          description: "Your account has been created and you're now signed in!",
+        });
+        setEmail("");
+        setPassword("");
+      }
     }
   };
 
