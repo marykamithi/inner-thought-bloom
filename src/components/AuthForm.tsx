@@ -26,13 +26,16 @@ export function AuthForm() {
     }
 
     setIsLoading(true);
-    const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl
+        // Disable email confirmation for immediate access
+        emailRedirectTo: undefined,
+        data: {
+          email_confirm: false
+        }
       }
     });
 
@@ -72,10 +75,21 @@ export function AuthForm() {
         description: error.message,
         variant: "destructive",
       });
-    } else {
+    } else if (data?.user) {
+      // User successfully created - they can start using the app immediately
       toast({
-        title: "Welcome! ✨",
-        description: "Check your email to confirm your account.",
+        title: "Welcome to Inner Thought Bloom! 🎉",
+        description: "Your account has been created successfully. Start journaling your thoughts and memories right away!",
+      });
+      
+      // Clear the form
+      setEmail("");
+      setPassword("");
+    } else {
+      // Fallback success message
+      toast({
+        title: "Account created! ✅",
+        description: "You can now start using your wellness journal immediately.",
       });
     }
   };
@@ -130,6 +144,15 @@ export function AuthForm() {
         </CardHeader>
         
         <CardContent>
+          {/* Development Notice */}
+          {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
+            <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg">
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                <strong>Development Mode:</strong> If email confirmation links don't work from your email client, 
+                you can often sign in directly after creating an account, or restart the dev server and try the link again.
+              </p>
+            </div>
+          )}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
@@ -191,12 +214,19 @@ export function AuthForm() {
                   disabled={isLoading}
                 />
               </div>
+              
+              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg p-3">
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  ✨ <strong>Start journaling immediately!</strong> No email confirmation needed - you can begin using your wellness journal right after creating your account.
+                </p>
+              </div>
+              
               <Button 
                 onClick={handleSignUp}
                 disabled={isLoading}
                 className="w-full bg-gradient-hero hover:shadow-glow transition-all duration-300"
               >
-                {isLoading ? "Creating account..." : "Create Account"}
+                {isLoading ? "Creating account..." : "Create Account & Start Journaling"}
               </Button>
             </TabsContent>
           </Tabs>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, PenTool, BarChart3, User, Menu, LogOut, BookOpen, Activity, Brain, Shield, Search, Download, Settings } from "lucide-react";
+import { Heart, PenTool, BarChart3, User, Menu, LogOut, BookOpen, Activity, Brain, Shield, Search, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { ThemeToggle } from "./ThemeToggle";
@@ -23,7 +23,6 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
     { id: 'meditation', label: 'Meditation', icon: Brain },
     { id: 'export', label: 'Export', icon: Download },
     { id: 'support', label: 'Support', icon: Heart },
-    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (

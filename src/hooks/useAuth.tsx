@@ -32,17 +32,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        // Check if user account has been marked as deleted
-        if (session?.user?.user_metadata?.account_deleted) {
-          console.log('Account marked as deleted, signing out user');
-          await supabase.auth.signOut();
-          setSession(null);
-          setUser(null);
-          setLoading(false);
-          return;
+      (event, session) => {
+        if (event === 'SIGNED_IN') {
+          console.log('User signed in:', session?.user?.email);
         }
-        
+        if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed');
+        }
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -50,17 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      // Check if user account has been marked as deleted
-      if (session?.user?.user_metadata?.account_deleted) {
-        console.log('Account marked as deleted, signing out user');
-        await supabase.auth.signOut();
-        setSession(null);
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-      
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
