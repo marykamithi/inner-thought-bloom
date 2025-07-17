@@ -12,6 +12,7 @@ export function AuthForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("signin");
   const { toast } = useToast();
 
   const handleSignUp = async () => {
@@ -38,6 +39,30 @@ export function AuthForm() {
     setIsLoading(false);
 
     if (error) {
+      // Check if user already exists with various possible error messages
+      if (error.message.includes("already registered") || 
+          error.message.includes("already been registered") ||
+          error.message.includes("User already registered") ||
+          error.message.includes("already signed up") ||
+          error.message.includes("email address is already in use")) {
+        toast({
+          title: "Welcome back! 👋",
+          description: "This email is already registered. Switching you to sign in...",
+        });
+        // Switch to sign-in tab and keep the email filled
+        setActiveTab("signin");
+        setPassword(""); // Clear password for security
+        
+        // Add a small delay and show another helpful message
+        setTimeout(() => {
+          toast({
+            title: "Ready to sign in! 🔑",
+            description: "Please enter your password to access your journal.",
+          });
+        }, 1500);
+        return;
+      }
+      
       toast({
         title: "Sign up failed",
         description: error.message,
@@ -101,7 +126,7 @@ export function AuthForm() {
         </CardHeader>
         
         <CardContent>
-          <Tabs defaultValue="signin" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
