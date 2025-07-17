@@ -164,12 +164,12 @@ export function WellnessGoals() {
         {/* Add new goal */}
         <div className="space-y-3 p-4 border border-accent/30 rounded-lg">
           <Input
-            placeholder="What wellness goal would you like to achieve?"
+            placeholder="Dream big! What wellness goal inspires you? (e.g., 'Feel more energized daily', 'Practice mindfulness', 'Build healthy sleep habits')"
             value={newGoal}
             onChange={(e) => setNewGoal(e.target.value)}
           />
           <Textarea
-            placeholder="Describe your goal (optional)"
+            placeholder="Paint the picture... Why is this goal meaningful to you? How will achieving it transform your daily life and well-being?"
             value={newDescription}
             onChange={(e) => setNewDescription(e.target.value)}
             className="min-h-[80px]"

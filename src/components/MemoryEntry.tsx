@@ -138,7 +138,7 @@ export function MemoryEntry() {
 
               <div className="relative">
                 <Textarea
-                  placeholder="What's on your mind today? Share your thoughts, feelings, or memories..."
+                  placeholder="Take a moment to reflect... How are you feeling today? What thoughts are flowing through your mind? This is your safe space to express yourself freely and authentically..."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   className="min-h-[120px] resize-none border-2 border-accent/30 focus:border-primary/50 bg-background/50 backdrop-blur-sm transition-all duration-300"

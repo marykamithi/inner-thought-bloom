@@ -250,7 +250,7 @@ export function SearchMemories() {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search your memories, moods, or AI insights..."
+            placeholder="Explore your wellness journey... Search memories, emotions, insights, or life moments that matter to you..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 h-12 text-base border-2 border-accent/30 focus:border-primary/50 bg-background/50 backdrop-blur-sm transition-all duration-300"
@@ -261,7 +261,7 @@ export function SearchMemories() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Select value={filters.mood} onValueChange={(value) => setFilters(prev => ({ ...prev, mood: value }))}>
             <SelectTrigger>
-              <SelectValue placeholder="Filter by mood" />
+              <SelectValue placeholder="How were you feeling?" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Moods</SelectItem>
@@ -288,7 +288,7 @@ export function SearchMemories() {
 
           <Select value={filters.dateRange} onValueChange={(value) => setFilters(prev => ({ ...prev, dateRange: value }))}>
             <SelectTrigger>
-              <SelectValue placeholder="Filter by date" />
+              <SelectValue placeholder="When did it happen?" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Time</SelectItem>
@@ -301,7 +301,7 @@ export function SearchMemories() {
 
           <Select value={filters.sortBy} onValueChange={(value) => setFilters(prev => ({ ...prev, sortBy: value }))}>
             <SelectTrigger>
-              <SelectValue placeholder="Sort by" />
+              <SelectValue placeholder="Show me..." />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="newest">Newest First</SelectItem>
@@ -316,10 +316,11 @@ export function SearchMemories() {
             <Button 
               variant="outline" 
               onClick={clearFilters}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full md:w-auto"
             >
               <X className="h-4 w-4" />
-              Clear Filters
+              <span className="hidden sm:inline">Clear Filters</span>
+              <span className="sm:hidden">Clear</span>
             </Button>
           )}
         </div>

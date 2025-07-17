@@ -305,7 +305,7 @@ export function VoiceToText({ onTextReceived, initialText = "" }: VoiceToTextPro
 
         <div className="relative">
           <Textarea
-            placeholder="Start recording to see your speech converted to text, or type directly..."
+            placeholder="Let your voice be heard... Start recording to transform your spoken thoughts into text, or type your reflections directly here. Every word matters on your wellness journey..."
             value={transcript + interimTranscript}
             onChange={(e) => handleTextChange(e.target.value)}
             className="min-h-[200px] resize-none border-2 border-accent/30 focus:border-primary/50 bg-background/50 backdrop-blur-sm transition-all duration-300"

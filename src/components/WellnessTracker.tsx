@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Droplets, Moon, Activity, Zap, Gauge, Calendar } from "lucide-react";
+import { Droplets, Moon, Activity, Zap, Gauge, Calendar, TrendingUp, BarChart3 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,6 +29,8 @@ export function WellnessTracker() {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [weeklyStats, setWeeklyStats] = useState<any>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -68,6 +70,36 @@ export function WellnessTracker() {
       console.error('Error fetching metrics:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchWeeklyStats = async () => {
+    try {
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      
+      const { data, error } = await supabase
+        .from('wellness_metrics')
+        .select('*')
+        .eq('user_id', user?.id)
+        .gte('date', weekAgo.toISOString().split('T')[0])
+        .order('date', { ascending: false });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const averages = {
+          sleep: (data.reduce((sum, d) => sum + (d.sleep_hours || 0), 0) / data.length).toFixed(1),
+          exercise: Math.round(data.reduce((sum, d) => sum + (d.exercise_minutes || 0), 0) / data.length),
+          water: (data.reduce((sum, d) => sum + (d.water_glasses || 0), 0) / data.length).toFixed(1),
+          energy: (data.reduce((sum, d) => sum + (d.energy_level || 0), 0) / data.length).toFixed(1),
+          stress: (data.reduce((sum, d) => sum + (d.stress_level || 0), 0) / data.length).toFixed(1),
+          daysTracked: data.length
+        };
+        setWeeklyStats(averages);
+      }
+    } catch (error) {
+      console.error('Error fetching weekly stats:', error);
     }
   };
 
@@ -117,6 +149,16 @@ export function WellnessTracker() {
         title: "Metrics saved! 📊",
         description: "Your wellness data has been recorded for today.",
       });
+
+      // Fetch updated weekly stats and show summary
+      await fetchWeeklyStats();
+      setShowSummary(true);
+      
+      // Auto-hide summary after 10 seconds
+      setTimeout(() => {
+        setShowSummary(false);
+      }, 10000);
+
     } catch (error: any) {
       toast({
         title: "Error saving metrics",
@@ -294,6 +336,85 @@ export function WellnessTracker() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Weekly Summary Report */}
+      {showSummary && weeklyStats && (
+        <Card className="shadow-card bg-gradient-card border-0 animate-fade-in">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                Weekly Wellness Summary
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowSummary(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                ✕
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Your wellness trends over the past {weeklyStats.daysTracked} days
+            </p>
+          </CardHeader>
+          
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="text-center p-3 bg-background/60 rounded-lg">
+                <Moon className="h-6 w-6 text-blue-500 mx-auto mb-2" />
+                <div className="text-sm text-muted-foreground">Avg Sleep</div>
+                <div className="text-lg font-semibold">{weeklyStats.sleep}h</div>
+              </div>
+              
+              <div className="text-center p-3 bg-background/60 rounded-lg">
+                <Activity className="h-6 w-6 text-green-500 mx-auto mb-2" />
+                <div className="text-sm text-muted-foreground">Avg Exercise</div>
+                <div className="text-lg font-semibold">{weeklyStats.exercise}min</div>
+              </div>
+              
+              <div className="text-center p-3 bg-background/60 rounded-lg">
+                <Droplets className="h-6 w-6 text-cyan-500 mx-auto mb-2" />
+                <div className="text-sm text-muted-foreground">Avg Water</div>
+                <div className="text-lg font-semibold">{weeklyStats.water} glasses</div>
+              </div>
+              
+              <div className="text-center p-3 bg-background/60 rounded-lg">
+                <Zap className="h-6 w-6 text-yellow-500 mx-auto mb-2" />
+                <div className="text-sm text-muted-foreground">Avg Energy</div>
+                <div className="text-lg font-semibold">{weeklyStats.energy}/10</div>
+              </div>
+              
+              <div className="text-center p-3 bg-background/60 rounded-lg">
+                <Gauge className="h-6 w-6 text-red-500 mx-auto mb-2" />
+                <div className="text-sm text-muted-foreground">Avg Stress</div>
+                <div className="text-lg font-semibold">{weeklyStats.stress}/10</div>
+              </div>
+            </div>
+
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <BarChart3 className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">Weekly Insights</span>
+              </div>
+              <div className="space-y-1 text-sm text-muted-foreground">
+                {parseFloat(weeklyStats.sleep) >= 7 ? 
+                  "✅ Great sleep patterns this week!" : 
+                  "💤 Consider prioritizing more sleep for better wellness."}
+                <br />
+                {parseInt(weeklyStats.exercise) >= 30 ? 
+                  "🏃‍♀️ Excellent exercise consistency!" : 
+                  "🚶‍♀️ Try to increase daily movement for better health."}
+                <br />
+                {parseFloat(weeklyStats.energy) >= 6 ? 
+                  "⚡ Strong energy levels maintained!" : 
+                  "🔋 Focus on rest and nutrition to boost energy."}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

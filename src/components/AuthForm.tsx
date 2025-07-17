@@ -138,7 +138,7 @@ export function AuthForm() {
                 <Input
                   id="signin-email"
                   type="email"
-                  placeholder="your@email.com"
+                  placeholder="Enter your email to continue your wellness journey..."
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
@@ -149,7 +149,7 @@ export function AuthForm() {
                 <Input
                   id="signin-password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="Your secure password..."
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}

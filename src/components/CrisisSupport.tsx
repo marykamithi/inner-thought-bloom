@@ -51,7 +51,7 @@ const supportResources: SupportResource[] = [
     name: 'Befrienders Kenya',
     description: 'Emotional support and suicide prevention services for anyone in distress.',
     phone: '+254 722 178 177',
-    website: 'https://befrienderskenya.org',
+    website: 'https://www.facebook.com/BefriendersKenya',
     availability: '24/7',
     type: 'crisis',
     country: 'Kenya'
@@ -61,7 +61,7 @@ const supportResources: SupportResource[] = [
     name: 'Mental Health Kenya',
     description: 'Free mental health support and counseling services.',
     phone: '+254 20 3000378',
-    website: 'https://mentalhealthkenya.org',
+    website: 'https://www.mentalhealthkenya.org',
     availability: 'Mon-Fri 8am-5pm',
     type: 'support',
     country: 'Kenya'
@@ -71,7 +71,7 @@ const supportResources: SupportResource[] = [
     name: 'Inuka Coaches',
     description: 'Professional counseling and mental health support services.',
     phone: '+254 701 163 050',
-    website: 'https://inukacoaches.co.ke',
+    website: 'https://www.linkedin.com/company/inuka-coaches',
     availability: 'Mon-Fri 9am-6pm',
     type: 'support',
     country: 'Kenya'
@@ -81,7 +81,7 @@ const supportResources: SupportResource[] = [
     name: 'Usikimye',
     description: 'Mental health awareness and support organization providing counseling services.',
     phone: '+254 794 814 738',
-    website: 'https://usikimye.or.ke',
+    website: 'https://www.facebook.com/usikimyeke',
     availability: 'Mon-Fri 8am-5pm',
     type: 'support',
     country: 'Kenya'
