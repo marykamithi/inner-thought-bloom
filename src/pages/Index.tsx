@@ -8,6 +8,7 @@ import { MeditationTimer } from "@/components/MeditationTimer";
 import { CrisisSupport } from "@/components/CrisisSupport";
 import { SearchMemories } from "@/components/SearchMemories";
 import { ExportData } from "@/components/ExportData";
+import { AccountSettings } from "@/components/AccountSettings";
 import { AuthForm } from "@/components/AuthForm";
 import { useAuth } from "@/hooks/useAuth";
 import { Heart, Sparkles, Brain } from "lucide-react";
@@ -46,6 +47,8 @@ const Index = () => {
         return <ExportData />;
       case 'support':
         return <CrisisSupport />;
+      case 'settings':
+        return <AccountSettings />;
       default:
         return <MemoryEntry />;
     }
