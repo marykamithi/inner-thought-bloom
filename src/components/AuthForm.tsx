@@ -30,6 +30,9 @@ export function AuthForm() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`
+      }
     });
 
     setIsLoading(false);
@@ -42,7 +45,7 @@ export function AuthForm() {
       });
     } else if (data?.user) {
       toast({
-        title: "Check your email! �",
+        title: "Check your email! 📧",
         description: "We've sent you a confirmation link. Please check your email and click the link to activate your account.",
       });
       
@@ -71,44 +74,11 @@ export function AuthForm() {
     setIsLoading(false);
 
     if (error) {
-      // Check for email not confirmed error specifically
-      if (error.message.includes("Email not confirmed") || 
-          error.message.includes("not confirmed") || 
-          error.message.includes("email_not_confirmed")) {
-        
-        toast({
-          title: "Email confirmation bypassed! 🎉",
-          description: "Don't worry about email confirmation - your account is ready! Try signing in again or refresh the page.",
-          variant: "default",
-        });
-        
-        // Automatically retry sign in after a short delay
-        setTimeout(async () => {
-          const { error: retryError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-          
-          if (!retryError) {
-            toast({
-              title: "Successfully signed in! �",
-              description: "Welcome to your memory journal!",
-            });
-          } else {
-            toast({
-              title: "Please try again",
-              description: "Click the Sign In button once more, or refresh the page and try again.",
-            });
-          }
-        }, 2000);
-        
-      } else {
-        toast({
-          title: "Sign in failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Sign in failed",
+        description: error.message,
+        variant: "destructive",
+      });
     } else {
       toast({
         title: "Welcome back! 💖",
@@ -135,15 +105,6 @@ export function AuthForm() {
         </CardHeader>
         
         <CardContent>
-          {/* Development Notice */}
-          {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
-            <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg">
-              <p className="text-xs text-blue-700 dark:text-blue-300">
-                <strong>Development Mode:</strong> Email confirmation is disabled for faster development. 
-                You can create an account and sign in immediately without email verification.
-              </p>
-            </div>
-          )}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
@@ -206,18 +167,12 @@ export function AuthForm() {
                 />
               </div>
               
-              <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-lg p-3">
-                <p className="text-xs text-green-700 dark:text-green-300">
-                  ✨ <strong>Quick access:</strong> Email confirmation is automatically handled! After creating your account, just sign in immediately - no email verification needed.
-                </p>
-              </div>
-              
               <Button 
                 onClick={handleSignUp}
                 disabled={isLoading}
                 className="w-full bg-gradient-hero hover:shadow-glow transition-all duration-300"
               >
-                {isLoading ? "Creating account..." : "Create Account & Start Journaling"}
+                {isLoading ? "Creating account..." : "Create Account"}
               </Button>
             </TabsContent>
           </Tabs>
