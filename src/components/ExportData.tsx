@@ -20,7 +20,9 @@ interface Memory {
   created_at: string;
   sentiment_label: string | null;
   ai_feedback: string | null;
-  mood_intensity: number | null;
+  sentiment_score: number | null;
+  updated_at: string;
+  user_id: string;
 }
 
 export function ExportData() {
@@ -139,7 +141,7 @@ export function ExportData() {
   };
 
   const exportToCSV = async (memories: Memory[]) => {
-    const headers = ['Date', 'Time', 'Content', 'Mood', 'Intensity', 'AI Feedback'];
+    const headers = ['Date', 'Time', 'Content', 'Mood', 'Score', 'AI Feedback'];
     const csvContent = [
       headers.join(','),
       ...memories.map(memory => [
@@ -147,7 +149,7 @@ export function ExportData() {
         `"${new Date(memory.created_at).toLocaleTimeString()}"`,
         `"${memory.content.replace(/"/g, '""')}"`,
         `"${memory.sentiment_label || 'N/A'}"`,
-        `"${memory.mood_intensity || 'N/A'}"`,
+        `"${memory.sentiment_score || 'N/A'}"`,
         `"${memory.ai_feedback?.replace(/"/g, '""') || 'N/A'}"`
       ].join(','))
     ].join('\n');
@@ -176,7 +178,7 @@ export function ExportData() {
         content: memory.content,
         createdAt: memory.created_at,
         mood: memory.sentiment_label,
-        moodIntensity: memory.mood_intensity,
+        sentimentScore: memory.sentiment_score,
         aiInsight: memory.ai_feedback
       })),
       statistics: {

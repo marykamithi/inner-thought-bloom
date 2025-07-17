@@ -69,7 +69,6 @@ export function MemoryEntry() {
           sentiment_score: analysisData?.sentiment_score || null,
           sentiment_label: selectedMood || analysisData?.sentiment_label || null,
           ai_feedback: analysisData?.feedback || null,
-          mood_intensity: moodIntensity || null,
         });
 
       if (dbError) {

@@ -32,7 +32,9 @@ interface Memory {
   created_at: string;
   sentiment_label: string | null;
   ai_feedback: string | null;
-  mood_intensity: number | null;
+  sentiment_score: number | null;
+  updated_at: string;
+  user_id: string;
 }
 
 interface SearchFilters {
