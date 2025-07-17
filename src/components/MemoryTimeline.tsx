@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Calendar, Clock, Smile, Meh, Frown, BookOpen, Trash2 } from "lucide-react";
+import { Calendar, Clock, Smile, Meh, Frown, BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -42,7 +42,6 @@ const getMoodColor = (mood?: string) => {
 export function MemoryTimeline() {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -65,36 +64,6 @@ export function MemoryTimeline() {
       console.error('Error fetching memories:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const deleteMemory = async (memoryId: string) => {
-    setDeletingId(memoryId);
-    
-    try {
-      const { error } = await supabase
-        .from('memories')
-        .delete()
-        .eq('id', memoryId);
-
-      if (error) throw error;
-
-      // Remove the memory from the local state
-      setMemories(memories.filter(memory => memory.id !== memoryId));
-      
-      toast({
-        title: "Memory deleted",
-        description: "Your memory has been successfully removed.",
-      });
-    } catch (error: any) {
-      console.error('Error deleting memory:', error);
-      toast({
-        title: "Error deleting memory",
-        description: error.message || "Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setDeletingId(null);
     }
   };
 
@@ -169,41 +138,6 @@ export function MemoryTimeline() {
                           <span className="capitalize">{entry.sentiment_label}</span>
                         </div>
                       )}
-                      
-                      {/* Delete Button */}
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                            disabled={deletingId === entry.id}
-                          >
-                            {deletingId === entry.id ? (
-                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-destructive"></div>
-                            ) : (
-                              <Trash2 className="h-3 w-3" />
-                            )}
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Memory?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete this memory? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => deleteMemory(entry.id)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
                     </div>
                   </div>
                   

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Circle, Target, Calendar, Trash2, Edit } from "lucide-react";
+import { CheckCircle, Circle, Target, Calendar, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -120,30 +120,6 @@ export function WellnessGoals() {
     }
   };
 
-  const deleteGoal = async (goalId: string) => {
-    try {
-      const { error } = await supabase
-        .from('wellness_goals')
-        .delete()
-        .eq('id', goalId);
-
-      if (error) throw error;
-
-      setGoals(goals.filter(goal => goal.id !== goalId));
-      
-      toast({
-        title: "Goal deleted",
-        description: "Your wellness goal has been removed.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error deleting goal",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
   if (loading) {
     return (
       <div className="w-full max-w-2xl mx-auto flex items-center justify-center py-12">
@@ -236,36 +212,6 @@ export function WellnessGoals() {
                     Completed
                   </Badge>
                 )}
-                
-                {/* Delete Button */}
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Goal?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to delete this wellness goal? This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => deleteGoal(goal.id)}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
               </div>
             </div>
           ))}

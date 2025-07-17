@@ -31,7 +31,6 @@ export function AuthForm() {
       email,
       password,
       options: {
-        // Disable email confirmation for immediate access
         emailRedirectTo: undefined,
         data: {
           email_confirm: false
@@ -78,19 +77,29 @@ export function AuthForm() {
     } else if (data?.user) {
       // User successfully created - they can start using the app immediately
       toast({
-        title: "Welcome to Inner Thought Bloom! 🎉",
-        description: "Your account has been created successfully. Start journaling your thoughts and memories right away!",
+        title: "Account created successfully! 🎉",
+        description: "You can now sign in with your new account. Switch to the Sign In tab to access your wellness journal!",
       });
       
-      // Clear the form
-      setEmail("");
-      setPassword("");
+      // Switch to sign-in tab and keep the email filled
+      setActiveTab("signin");
+      setPassword(""); // Clear password for security
+      
+      // Add a small delay and show sign-in instructions
+      setTimeout(() => {
+        toast({
+          title: "Ready to sign in! 🔑",
+          description: "Please enter your password to start your wellness journey.",
+        });
+      }, 1500);
     } else {
       // Fallback success message
       toast({
         title: "Account created! ✅",
-        description: "You can now start using your wellness journal immediately.",
+        description: "You can now sign in with your new account.",
       });
+      setActiveTab("signin");
+      setPassword("");
     }
   };
 
@@ -148,8 +157,8 @@ export function AuthForm() {
           {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
             <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg">
               <p className="text-xs text-blue-700 dark:text-blue-300">
-                <strong>Development Mode:</strong> If email confirmation links don't work from your email client, 
-                you can often sign in directly after creating an account, or restart the dev server and try the link again.
+                <strong>Development Mode:</strong> Email confirmation is disabled for faster development. 
+                You can create an account and sign in immediately without email verification.
               </p>
             </div>
           )}
@@ -215,9 +224,9 @@ export function AuthForm() {
                 />
               </div>
               
-              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg p-3">
-                <p className="text-xs text-blue-700 dark:text-blue-300">
-                  ✨ <strong>Start journaling immediately!</strong> No email confirmation needed - you can begin using your wellness journal right after creating your account.
+              <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-lg p-3">
+                <p className="text-xs text-green-700 dark:text-green-300">
+                  ✨ <strong>Quick start:</strong> No email confirmation needed! After creating your account, you can immediately sign in and start using your wellness journal.
                 </p>
               </div>
               
